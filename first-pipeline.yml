@@ -1,9 +1,17 @@
+resource_types:
+- name: git-resource
+  type: registry-image
+  source:
+    repository: concourse/git-resource
+    tag: latest
+
 resources:
 - name: hello-repo
   type: git
   source:
     uri: https://github.com/gabriel-mendes-velasco/concourse-testing.git
     branch: main
+
 jobs:
 - name: hsay-world
   public: true
