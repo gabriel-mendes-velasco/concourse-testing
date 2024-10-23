@@ -1,0 +1,28 @@
+resources:
+- name: hello-repo
+  type: git
+  source:
+    uri: https://github.com/gabriel-mendes-velasco/concourse-testing.git
+    branch: main
+jobs:
+- name: hsay-world
+  public: true
+  plan:
+    - get: hello-repo
+    - task: making-world
+      config: 
+        platform: linux
+        image_resource:
+          type: registry-image
+          source: 
+            repository: busybox
+        inputs: 
+          - name: hello-repo
+        run:
+          path: /bin/sh
+          args: 
+            - -c
+            - |
+              echo "Executando o script hello.sh"
+              cat hello.sh
+
