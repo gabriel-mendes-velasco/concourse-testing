@@ -1,9 +1,9 @@
-resource_types:
-- name: git-resource
-  type: registry-image
-  source:
-    repository: concourse/git-resource
-    tag: latest
+#resource_types:
+#- name: git-resource
+#  type: registry-image
+#  source:
+#    repository: concourse/git-resource
+#    tag: latest
 
 resources:
 - name: hello-repo
@@ -13,7 +13,7 @@ resources:
     branch: main
 
 jobs:
-- name: hsay-world
+- name: say-world
   public: true
   plan:
     - get: hello-repo
@@ -31,6 +31,8 @@ jobs:
           args: 
             - -c
             - |
+              echo "Ajustando a config do repo"
+              git config --global --add safe.directory /tmp/build/get
               echo "Executando o script hello.sh"
               cat hello.sh
 
