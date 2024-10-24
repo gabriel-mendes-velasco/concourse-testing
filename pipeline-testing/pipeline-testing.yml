@@ -68,4 +68,4 @@ jobs:
               echo $IMAGE_TAG > docker-images-ruby/latest.txt
               git add docker-images-ruby/
               git commit -m "Add Docker image and update latest tag to $IMAGE_TAG"
-              git push
+              git push origin main
