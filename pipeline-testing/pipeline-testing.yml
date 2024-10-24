@@ -38,6 +38,7 @@ jobs:
                 docker stop test-app-container
                 docker rm test-app-container
                 exit 1
+              fi
 
 - name: build-push
   public: true
