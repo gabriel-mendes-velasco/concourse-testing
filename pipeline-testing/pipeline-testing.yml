@@ -54,9 +54,6 @@ jobs:
             repository: docker
         inputs:
           - name: testing-repo
-        params:
-          DOCKER_USERNAME: ((docker-username))
-          DOCKER_PASSWORD: ((docker-password))
         run:
           path: /bin/sh
           args:
