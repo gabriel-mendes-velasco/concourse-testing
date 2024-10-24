@@ -1,0 +1,73 @@
+# pipeline-testing.yml
+resources:
+- name: testing-repo
+  type: git
+  source:
+    uri: https://github.com/gabriel-mendes-velasco/concourse-testing.git
+    branch: main
+
+jobs:
+- name: test-app
+  public: true
+  plan:
+    - get: testing-repo
+    - task: test-app
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: docker
+        inputs:
+          - name: testing-repo
+        run:
+          path: /bin/sh
+          args:
+            - -c
+            - |
+              cd testing-repo
+              docker build -t test-app .
+              docker run -d -p 4567:4567 --name test-app-container test-app
+              sleep 5
+              if curl -s http://localhost:4567 | grep -q "Hello World"; then
+                echo "Test passed!"
+                docker stop test-app-container
+                docker rm test-app-container
+              else
+                echo "Test failed!"
+                docker stop test-app-container
+                docker rm test-app-container
+                exit 1
+
+- name: build-push
+  public: true
+  plan:
+    - get: testing-repo
+      passed: [test-app]
+    - task: build-and-push
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: docker
+        inputs:
+          - name: testing-repo
+        params:
+          DOCKER_USERNAME: ((docker-username))
+          DOCKER_PASSWORD: ((docker-password))
+        run:
+          path: /bin/sh
+          args:
+            - -c
+            - |
+              cd testing-repo
+              IMAGE_TAG="app-v${BUILD_ID}"
+              docker build -t docker-images-ruby:$IMAGE_TAG .
+              docker save -o docker-images-ruby-$IMAGE_TAG.tar docker-images-ruby:$IMAGE_TAG
+              mkdir -p docker-images-ruby
+              mv docker-images-ruby-$IMAGE_TAG.tar docker-images-ruby/
+              echo $IMAGE_TAG > docker-images-ruby/latest.txt
+              git add docker-images-ruby/
+              git commit -m "Add Docker image and update latest tag to $IMAGE_TAG"
+              git push

@@ -1,0 +1,23 @@
+# Hello World API and Concourse Pipeline
+
+## API
+
+This is a simple Ruby API that returns "Hello World".
+
+### Running the API
+
+1. Install Ruby and Sinatra:
+   ```sh
+   gem install sinatra
+   to run the application use ruby app.rb
+2. Make sure that you have docker to test
+   to build the image use: docker build -t your-docker-repo/hello-world .
+
+   to run the container use: docker run -p 4567:4567 your-docker-repo/hello-world
+
+3. This pipeline is meant to run in concourse, so make sure that you have concourse up and running 
+   in the concourse you can use these following commands:
+   3.1 fly -t target login -c http://concourse-url
+   3.2 fly -t target set-pipeline -p ruby-pipeline -c pipeline.yml
+   3.3 fly -t target unpause-pipeline -p ruby-pipeline
+   3.4 fly -t target trigger-job -j hello-world-pipeline/build-and-push
